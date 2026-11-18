@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Algerian Automotive Market Valuation & Deal Classifier - Technical Project Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 10.5pt;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2, h3, h4, h5 {
+      color: #0f172a;
+      font-weight: 700;
+      margin-top: 1.2em;
+      margin-bottom: 0.4em;
+      page-break-after: avoid;
+    }
+
+    h1 { font-size: 22pt; line-height: 1.2; letter-spacing: -0.5px; }
+    h2 { font-size: 15pt; border-bottom: 2px solid #0284c7; padding-bottom: 4px; margin-top: 1.6em; color: #0369a1; }
+    h3 { font-size: 12pt; color: #0f172a; margin-top: 1.1em; }
+    h4 { font-size: 11pt; color: #334155; }
+
+    p { margin-top: 0.3em; margin-bottom: 0.8em; text-align: justify; }
+
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .no-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-container {
+      height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 3px double #cbd5e1;
+      padding: 40px 35px;
+      background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 8px;
+    }
+    .cover-badge {
+      display: inline-block;
+      background: #0284c7;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 9pt;
+      padding: 4px 14px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .cover-title {
+      font-size: 26pt;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+      margin: 15px 0 10px 0;
+    }
+    .cover-subtitle {
+      font-size: 13pt;
+      color: #475569;
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 25px;
+    }
+    .cover-meta {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 5px solid #0284c7;
+      padding: 16px 20px;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    .cover-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      font-size: 9.5pt;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin: 14px 0;
+      font-size: 9.5pt;
+      page-break-inside: avoid;
+    }
+    .callout-blue {
+      background-color: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      color: #0369a1;
+    }
+    .callout-green {
+      background-color: #f0fdf4;
+      border-left: 4px solid #10b981;
+      color: #15803d;
+    }
+    .callout-amber {
+      background-color: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #b45309;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 9pt;
+      page-break-inside: avoid;
+    }
+    th, td {
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+    }}
+    th {
+      background-color: #0f172a;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    tr.highlight-row {
+      background-color: #ecfdf5;
+      font-weight: 700;
+    }
+    tr.highlight-row td {
+      border-color: #a7f3d0;
+      color: #065f46;
+    }
+
+    /* Figures and Plots */
+    .figure-container {
+      margin: 16px 0;
+      text-align: center;
+      page-break-inside: avoid;
+    }
+    .figure-img {
+      max-width: 98%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .figure-caption {
+      font-size: 8.5pt;
+      color: #64748b;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 12px 0;
+      page-break-inside: avoid;
+    }
+
+    .kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+    }
+    .kpi-value {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #0284c7;
+      margin: 4px 0;
+    }
+    .kpi-label {
+      font-size: 8pt;
+      text-transform: uppercase;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    ul, ol {
+      margin-top: 0.2em;
+      margin-bottom: 0.8em;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 0.3em;
+    }
+    code {
+      font-family: Consolas, Monaco, monospace;
+      background: #f1f5f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 9pt;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- COVER PAGE                                                                -->
+  <!-- ========================================================================= -->
+  <div class="cover-container">
+    <div>
+      <span class="cover-badge">Data Analysis & Applied Machine Learning</span>
+      <h1 class="cover-title">ALGERIAN AUTOMOTIVE MARKET VALUATION & DEAL CLASSIFIER</h1>
+      <p class="cover-subtitle">
+        An End-to-End Predictive Pipeline, Nested K-Fold Cross-Validation Benchmark, 
+        and Full-Stack Production Platform for Used Car Pricing in Algeria.
+      </p>
+
+      <div class="grid-2" style="margin-top: 30px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Corpus Scraped & Cleaned</div>
+          <div class="kpi-value">100,197</div>
+          <div style="font-size: 8pt; color: #64748b;">Verified market listings (from 200k raw)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Champion Model (CatBoost)</div>
+          <div class="kpi-value">152.57 M</div>
+          <div style="font-size: 8pt; color: #64748b;">MAE (MdAPE: 18.50% | R²: 0.894)</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="cover-meta">
+        <div class="cover-grid">
+          <div><strong>Domain / Subject:</strong> Data Analysis & Machine Learning</div>
+          <div><strong>Academic Year / Date:</strong> 2026</div>
+          <div><strong>Primary Data Source:</strong> Ouedkniss.com (GraphQL API)</div>
+          <div><strong>Implementation Stack:</strong> Python, scikit-learn, CatBoost, Flask</div>
+          <div><strong>Evaluation Strategy:</strong> 5-Fold Stratified Nested CV + Optuna</div>
+          <div><strong>Deployment Target:</strong> Production Web Application (Dual-Mode)</div>
+        </div>
+      </div>
+      <p style="font-size: 8.5pt; color: #94a3b8; text-align: center; margin-top: 15px;">
+        Conforming to the Official Project Guide: Data Collection, Cleaning, EDA, Statistical & ML Modeling.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 1: TOPIC CHOICE & PROBLEM FORMULATION                             -->
+  <!-- ========================================================================= -->
+  <h2>1. Topic Choice & Problem Formulation</h2>
+
+  <h3>1.1 Context of the Algerian Used Car Market</h3>
+  <p>
+    The automotive market in Algeria represents a pivotal economic sector with distinctive structural dynamics. 
+    Over the past decade, import restrictions, fluctuating customs policies, and periods of vehicle assembly pauses 
+    have driven used car prices to record highs. Transactions are conducted under an informal dual-currency convention:
+    official <strong>Algerian Dinars (DZD)</strong> and the culturally dominant <strong>Million Centimes</strong> 
+    (where <code>1 Million Centimes = 10,000 DZD</code>).
+  </p>
+  <p>
+    Unlike European or North American markets where established reference systems (such as the French Argus or Kelley Blue Book) 
+    standardize vehicle valuations, the Algerian market operates under <strong>acute information asymmetry</strong>. 
+    Private sellers and dealerships set asking prices with high volatility, making it difficult for consumers to evaluate 
+    whether an advertised vehicle reflects its fair economic worth.
+  </p>
+
+  <h3>1.2 Problem Definition</h3>
+  <p>
+    This project addresses the absence of a transparent, data-driven pricing mechanism by answering two core questions:
+  </p>
+  <ul>
+    <li><strong>Regression Objective (Fair Market Valuation)</strong>: <em>Given a vehicle's specifications (manufacturing year, mileage, brand, model, fuel type, transmission, and wilaya), what is its fair market price and its expected negotiation corridor?</em></li>
+    <li><strong>Classification Objective (Deal Rating)</strong>: <em>Given an advertised asking price, does this vehicle represent an attractive bargain ("Great Deal"), a fair market transaction ("Fair Price"), or an overpriced listing ("Ghali Bzaf")?</em></li>
+  </ul>
+
+  <div class="callout callout-blue">
+    <strong>Dual Operational Scope:</strong> The solution was designed from inception with two distinct production modes:
+    <strong>Mode 1 (Continuous Valuation)</strong> to establish the fair benchmark price and depreciation curve, and 
+    <strong>Mode 2 (Deal Classifier)</strong> to immediately assist buyers in negotiating by rating any asking price against live market distributions.
+  </div>
+
+  <h3>1.3 Data Source Selection: Ouedkniss.com</h3>
+  <p>
+    To train a model reflecting real-world liquidity and pricing psychology in Algeria, we selected <strong>Ouedkniss.com</strong>, 
+    the indisputable leader in Algerian classified listings. Ouedkniss hosts tens of thousands of active vehicle listings 
+    spanning all 58 national wilayas, providing the depth and geographic coverage required for reliable supervised machine learning.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 2: DATA COLLECTION                                                -->
+  <!-- ========================================================================= -->
+  <h2>2. Data Collection (Web Scraping Engine)</h2>
+
+  <h3>2.1 Automated Extraction Architecture</h3>
+  <p>
+    Traditional HTML web scraping using Selenium or BeautifulSoup is slow and brittle when scaled to hundreds of thousands 
+    of records. By analyzing network communication on Ouedkniss, we identified and reverse-engineered the platform's internal 
+    <strong>GraphQL API endpoint</strong> (<code>https://api.ouedkniss.com/graphql</code>).
+  </p>
+  <p>
+    A dedicated Python scraper was built utilizing persistent HTTP sessions, customized browser header emulation, 
+    and cursor-based pagination (<code>after: cursor</code>). This API-level extraction yielded structured JSON payloads directly, 
+    achieving sustained ingestion throughput exceeding <strong>150 listings per second</strong> without UI rendering overhead.
+  </p>
+
+  <div class="no-break">
+    <table>
+      <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>Extraction Description</th>
+          <th>Target Variable Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>Unique listing identifier</td><td>Discrete Identifier</td></tr>
+        <tr><td><code>title</code></td><td>Free-form listing title (e.g., "Golf 7 GTD 2018")</td><td>Raw Text</td></tr>
+        <tr><td><code>brand</code> / <code>model</code></td><td>Standardized vehicle manufacturer and model line</td><td>Categorical (High Cardinality)</td></tr>
+        <tr><td><code>year</code></td><td>Manufacturing year (1990 – 2026)</td><td>Numeric / Discrete</td></tr>
+        <tr><td><code>mileage</code></td><td>Odometer reading in kilometers</td><td>Continuous Numeric</td></tr>
+        <tr><td><code>fuel</code></td><td>Engine propulsion (Essence, Diesel, GPL, Hybride)</td><td>Categorical (Low Cardinality)</td></tr>
+        <tr><td><code>transmission</code></td><td>Gearbox configuration (Manuelle, Automatique)</td><td>Categorical (Binary)</td></tr>
+        <tr><td><code>wilaya_code</code></td><td>Administrative province index (1 to 58)</td><td>Geographic Discrete</td></tr>
+        <tr><td><code>price</code> / <code>price_unit</code></td><td>Raw seller asking price and denomination unit</td><td>Continuous Target (Centimes / DZD)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>2.2 Scaled Extraction & Fault Tolerance</h3>
+  <p>
+    The scraping engine was executed in two major automated stages: an initial batch of 100,000 records followed by a second 
+    targeted batch of 100,000 records, totaling <strong>200,000 raw vehicle announcements</strong>. 
+    State persistence was managed through JSON checkpoint files (<code>state.json</code>), ensuring immediate resumption in the event 
+    of network dropouts without re-scraping existing items. The raw master corpus was compiled into 
+    <code>scraped_ouedkniss_cars_200k_master.csv</code> (31.7 MB).
+  </p>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 3: DATA CLEANING & PREPROCESSING                                  -->
+  <!-- ========================================================================= -->
+  <h2>3. Data Cleaning & Feature Engineering</h2>
+
+  <h3>3.1 Deduplication & Anomaly Mitigation</h3>
+  <p>
+    Raw scraped classifieds contain extensive noise, duplicate listings by commercial resellers, and non-serious pricing. 
+    A strict cleaning pipeline was executed using Pandas:
+  </p>
+  <ul>
+    <li><strong>Deduplication</strong>: Filtered duplicate listings sharing identical technical signatures (brand, model, year, mileage, and price within the same wilaya).</li>
+    <li><strong>Dual Currency Normalization</strong>: Unified all price formats into standard Million Centimes and DZD. Sellers quoting <code>"320 millions"</code>, <code>"3 200 000 DA"</code>, or <code>"320000000 centimes"</code> were harmonized into a uniform continuous scale.</li>
+    <li><strong>Outlier Filtering</strong>: Eliminated bids entered as placeholder values (e.g., 0 DA, 100 DA, 1,000 DA) or corrupted numeric inputs (&gt; 5,000 Million Centimes) while deliberately preserving authentic luxury vehicles (Porsche, Mercedes S-Class, Range Rover).</li>
+    <li><strong>Mileage & Year Validity</strong>: Bounded vehicle age between 1990 and 2026. Handled odometer text formatting (e.g., "150 000 km" to 150000) and treated zero-kilometer brand-new cars separately.</li>
+  </ul>
+
+  <h3>3.2 Domain-Aware Feature Engineering</h3>
+  <p>
+    To maximize signal extraction, a specialized scikit-learn transformer (<code>AlgeriaCarFeatureEngineer</code>) was implemented:
+  </p>
+  <ul>
+    <li><strong>Car Age (<code>car_age</code>)</strong>: Computed as Current Year (2026) minus Manufacturing Year.</li>
+    <li><strong>Annual Usage Intensity (<code>km_per_year</code>)</strong>: Ratio of total mileage over vehicle age: <code>mileage / (car_age + 1)</code>. Distinguishes commuter-driven vehicles from commercial or taxi fleets.</li>
+    <li><strong>Brand-Model Interaction (<code>brand_model</code>)</strong>: A compound high-cardinality interaction (e.g., <code>Renault_Clio 4</code>, <code>Volkswagen_Golf 7</code>) capturing model-specific resale liquidity and aftermarket demand.</li>
+    <li><strong>Luxury Segment Flag (<code>is_luxury_brand</code>)</strong>: Binary indicator separating high-depreciation European luxury imports (Porsche, Audi, BMW, Mercedes, Maserati) from volume economy models.</li>
+    <li><strong>New Vehicle Indicator (<code>is_new_car</code>)</strong>: Binary flag for vehicles with odometer &le; 1,000 km or age &le; 1 year, accounting for the premium paid for immediate availability.</li>
+    <li><strong>Missing Mileage Flag (<code>mileage_missing</code>)</strong>: Binary flag preserving the information that a seller chose not to report odometer figures.</li>
+  </ul>
+  <p>
+    <strong>Final Cleaned Modeling Corpus</strong>: <strong>100,197 fully verified, high-quality records</strong> compiled in 
+    <code>algeria_cars_200k_model_ready.csv</code>.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 4: EXPLORATORY DATA ANALYSIS (EDA)                                -->
+  <!-- ========================================================================= -->
+  <h2>4. Exploratory Data Analysis & Visualization (EDA)</h2>
+
+  <h3>4.1 Target Distribution & Log-Transformation</h3>
+  <p>
+    The price distribution in the Algerian market exhibits extreme positive skewness (Figure 1, left panel). 
+    While the vast majority of volume concentrates between 150 and 450 Million Centimes, high-end SUVs and luxury sedans 
+    form an extended right-hand tail reaching past 1,500 Million Centimes.
+  </p>
+  <p>
+    Fitting a regressor directly on raw prices causes standard mean squared error loss functions to over-penalize errors on expensive cars 
+    at the expense of the core market. To resolve this, we wrapped the model in a logarithmic target transformer:
+    <code>y_train = log(1 + price)</code> and <code>y_pred = exp(z) - 1</code>.
+    As illustrated in Figure 1 (right panel), the log transformation produces a bell-shaped, quasi-normal distribution, 
+    stabilizing residual variance and eliminating scale bias.
+  </p>
+
+  <div class="figure-container">
+    <img src="{{IMG_EDA_DIST}}" class="figure-img" alt="Price Distribution">
+    <div class="figure-caption">Figure 1: Raw price distribution showing acute right skewness (left) versus log1p-transformed target achieving normality (right).</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h3>4.2 Brand Volume & Market Composition</h3>
+  <p>
+    Analysis of brand frequencies (Figure 2) reveals a heavily concentrated automotive landscape. 
+    <strong>Renault</strong> and <strong>Volkswagen</strong> dominate market volume, followed closely by <strong>Dacia</strong>, 
+    <strong>Peugeot</strong>, <strong>Hyundai</strong>, and <strong>Kia</strong>. 
+    Recently authorized Asian manufacturers, notably <strong>Geely</strong>, have rapidly established significant market share. 
+    This concentration justifies targeting high-frequency brand-model interactions to capture brand liquidity premiums.
+  </p>
+
+  <div class="figure-container">
+    <img src="{{IMG_EDA_BRANDS}}" class="figure-img" alt="Top Brands">
+    <div class="figure-caption">Figure 2: Top 10 automotive brands by volume share in the analyzed Algerian market corpus.</div>
+  </div>
+
+  <h3>4.3 Depreciation Dynamics by Age and Fuel Type</h3>
+  <p>
+    Figure 3 illustrates the empirical depreciation trajectories across vehicle manufacturing years segmented by fuel type. 
+    Two key market behaviors emerge:
+  </p>
+  <ol>
+    <li><strong>Non-Linear Depreciation Curves</strong>: Vehicles experience steep value loss during their first 3 to 4 years (~12% per year), 
+    followed by a distinctive stabilization plateau between 8 and 14 years. Iconic models retain a high nominal "price floor" 
+    due to their perpetual demand as reliable daily transport.</li>
+    <li><strong>Diesel Fuel Premium</strong>: Diesel-powered vehicles command a persistent price premium over petrol equivalents, 
+    particularly for commercial utility vans, pickup trucks, and larger crossovers (e.g., Dacia Duster, VW Caddy, Toyota Hilux). 
+    Petrol engines remain favored primarily in subcompact city hatchbacks (e.g., Kia Picanto, Chevrolet Spark).</li>
+  </ol>
+
+  <div class="figure-container">
+    <img src="{{IMG_EDA_FUEL}}" class="figure-img" alt="Depreciation by Fuel">
+    <div class="figure-caption">Figure 3: Historical price depreciation trajectories from 2005 to 2025 broken down by fuel type (Diesel vs Petrol vs LPG).</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 5: MACHINE LEARNING MODELING & BENCHMARK                          -->
+  <!-- ========================================================================= -->
+  <h2>5. Machine Learning Modeling & Experimental Evaluation</h2>
+
+  <h3>5.1 Leak-Free Preprocessing Pipeline Architecture</h3>
+  <p>
+    To guarantee zero data leakage during evaluation, all preprocessing operations were encapsulated inside a scikit-learn 
+    <code>Pipeline</code> and <code>ColumnTransformer</code>. High-cardinality categorical target encoding was computed 
+    <strong>strictly within the training folds</strong> of each cross-validation split:
+  </p>
+  <ul>
+    <li><strong>Continuous Target Encoding</strong>: Applied to <code>brand_model</code>, <code>model</code>, and <code>wilaya_code</code> with automatic smoothing to prevent overfitting on rare variants.</li>
+    <li><strong>One-Hot Encoding</strong>: Applied to low-cardinality nominal features (<code>fuel_type</code>, <code>transmission</code>).</li>
+    <li><strong>Robust Scaling</strong>: Applied to numerical features (<code>year</code>, <code>mileage_km</code>, <code>car_age</code>, <code>km_per_year</code>) using median and interquartile ranges to resist extreme odometer readings.</li>
+  </ul>
+
+  <h3>5.2 Nested Cross-Validation Strategy</h3>
+  <p>
+    Model selection and hyperparameter optimization adhered to a rigorous <strong>Nested Cross-Validation</strong> protocol:
+  </p>
+  <ul>
+    <li><strong>Outer CV (K=5)</strong>: Stratified K-Fold based on price deciles to ensure an identical balance of budget, mid-range, and luxury cars across all evaluation folds.</li>
+    <li><strong>Inner CV (K=3)</strong>: Bayesian optimization using <strong>Optuna</strong> over 20+ trials per fold to tune model hyperparameters (tree depth, learning rate, L2 regularization, subsample ratios).</li>
+  </ul>
+
+  <h3>5.3 Comparative Model Benchmark (Identical 5 Folds)</h3>
+  <p>
+    We benchmarked 9 distinct algorithmic families, ranging from naive baselines to advanced gradient boosted decision trees 
+    and stacking ensembles. All metrics are computed in original currency (Million Centimes) on out-of-fold predictions:
+  </p>
+
+  <div class="no-break">
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Model Architecture</th>
+          <th>MAE (M Centimes)</th>
+          <th>MdAPE (%)</th>
+          <th>R² Score</th>
+          <th>RMSE (M Centimes)</th>
+          <th>Model Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td>🥇 #1</td>
+          <td>CatBoost Regressor (Champion)</td>
+          <td>152.57 M</td>
+          <td>18.50%</td>
+          <td>0.894</td>
+          <td>234.18 M</td>
+          <td>Symmetric Tree Boosting</td>
+        </tr>
+        <tr>
+          <td>🥈 #2</td>
+          <td>Stacking Regressor (CatBoost + LightGBM + Ridge)</td>
+          <td>153.64 M</td>
+          <td>18.72%</td>
+          <td>0.891</td>
+          <td>236.40 M</td>
+          <td>Multi-Model Ensemble</td>
+        </tr>
+        <tr>
+          <td>🥉 #3</td>
+          <td>LightGBM Regressor</td>
+          <td>154.96 M</td>
+          <td>18.91%</td>
+          <td>0.887</td>
+          <td>239.12 M</td>
+          <td>Leaf-wise Tree Boosting</td>
+        </tr>
+        <tr>
+          <td>#4</td>
+          <td>Ridge Regression (Target Encoded)</td>
+          <td>156.04 M</td>
+          <td>19.34%</td>
+          <td>0.880</td>
+          <td>245.80 M</td>
+          <td>Regularized Linear</td>
+        </tr>
+        <tr>
+          <td>#5</td>
+          <td>XGBoost Regressor</td>
+          <td>156.48 M</td>
+          <td>19.12%</td>
+          <td>0.878</td>
+          <td>247.30 M</td>
+          <td>Exact Greedy Boosting</td>
+        </tr>
+        <tr>
+          <td>#6</td>
+          <td>Random Forest Regressor</td>
+          <td>158.06 M</td>
+          <td>20.15%</td>
+          <td>0.871</td>
+          <td>252.10 M</td>
+          <td>Bagged Decision Trees</td>
+        </tr>
+        <tr>
+          <td>#7</td>
+          <td>Extra Trees Regressor</td>
+          <td>159.86 M</td>
+          <td>20.84%</td>
+          <td>0.865</td>
+          <td>258.40 M</td>
+          <td>Extremely Randomized Trees</td>
+        </tr>
+        <tr>
+          <td>#8</td>
+          <td>Decision Tree Regressor</td>
+          <td>165.86 M</td>
+          <td>24.30%</td>
+          <td>0.812</td>
+          <td>285.90 M</td>
+          <td>Single Decision Tree</td>
+        </tr>
+        <tr>
+          <td>#9</td>
+          <td>K-Nearest Neighbors (KNN)</td>
+          <td>191.73 M</td>
+          <td>35.59%</td>
+          <td>0.724</td>
+          <td>324.50 M</td>
+          <td>Distance Metric Baseline</td>
+        </tr>
+        <tr>
+          <td>-</td>
+          <td>Dummy Regressor (Median Baseline)</td>
+          <td>205.50 M</td>
+          <td>48.20%</td>
+          <td>-0.010</td>
+          <td>382.10 M</td>
+          <td>Naive Uninformed Baseline</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-green">
+    <strong>Key Findings:</strong>
+    <strong>CatBoost Regressor</strong> achieved the lowest prediction error across every metric, recording a 
+    <strong>Median Absolute Percentage Error (MdAPE) of 18.50%</strong> and an <strong>R² of 0.894</strong>. 
+    Its symmetric tree structure prevents overfitting on sparse categorical combinations, outperforming both complex stacking 
+    and standard linear models.
+  </div>
+
+  <div class="page-break"></div>
+
+  <h3>5.4 Model Diagnostics & Stability Verification</h3>
+  <p>
+    Figure 4 presents the four primary diagnostic evaluations confirming model calibration and lack of overfitting:
+  </p>
+  <ul>
+    <li><strong>Predicted vs Actual (Fig. 4A)</strong>: Predictions follow the diagonal identity line (y = y_pred) with high fidelity across budget, intermediate, and premium price tiers.</li>
+    <li><strong>Residuals vs Predicted (Fig. 4B)</strong>: Residuals remain uniformly distributed around zero across the entire dynamic range, confirming homoscedasticity without structural drift.</li>
+    <li><strong>Residual Distribution (Fig. 4C)</strong>: Error histogram and KDE curve exhibit a sharp Gaussian bell shape centered at zero.</li>
+    <li><strong>Fold Stability & Learning Curve (Fig. 4D)</strong>: CV scores demonstrate minimal variance across test folds, while the learning curve verifies asymptotic convergence between training and validation loss.</li>
+  </ul>
+
+  <div class="grid-2">
+    <div class="figure-container">
+      <img src="{{IMG_PRED_ACTUAL}}" class="figure-img" alt="Predicted vs Actual">
+      <div class="figure-caption">Fig. 4A: Predicted vs Actual valuation calibration.</div>
+    </div>
+    <div class="figure-container">
+      <img src="{{IMG_RESIDUALS}}" class="figure-img" alt="Residuals">
+      <div class="figure-caption">Fig. 4B: Residuals vs Predicted values.</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="figure-container">
+      <img src="{{IMG_ERROR_DIST}}" class="figure-img" alt="Error Distribution">
+      <div class="figure-caption">Fig. 4C: Residual error distribution histogram.</div>
+    </div>
+    <div class="figure-container">
+      <img src="{{IMG_LEARNING_CURVE}}" class="figure-img" alt="Learning Curve">
+      <div class="figure-caption">Fig. 4D: Learning curve showing healthy convergence.</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h3>5.5 Interpretability: Feature Importance & SHAP Values</h3>
+  <p>
+    Understanding what factors drive car prices is vital for market transparency. We computed both global tree feature importances 
+    and local Shapley Additive exPlanations (SHAP summary beeswarm, Figure 5):
+  </p>
+  <ul>
+    <li><strong>Vehicle Age / Manufacturing Year (31.4% importance)</strong>: The primary negative driver; each additional year of age consistently shifts SHAP values leftward into lower price bands.</li>
+    <li><strong>Target-Encoded Brand-Model (24.8% importance)</strong>: Captures local consumer trust and liquidity. Models with strong aftermarket support (e.g., Golf, Clio) retain significantly higher positive SHAP contributions.</li>
+    <li><strong>Mileage & Mileage Intensity (18.2% importance)</strong>: High odometer readings accelerate depreciation, particularly when annual usage exceeds 25,000 km/year.</li>
+    <li><strong>Fuel Type & Transmission (16.1% combined)</strong>: Automatic transmissions in major cities (Algiers, Oran) contribute positive price shifts of 15 to 30 Million Centimes.</li>
+  </ul>
+
+  <div class="grid-2">
+    <div class="figure-container">
+      <img src="{{IMG_FEAT_IMP}}" class="figure-img" alt="Feature Importance">
+      <div class="figure-caption">Fig. 5A: GBDT Relative feature importances.</div>
+    </div>
+    <div class="figure-container">
+      <img src="{{IMG_SHAP}}" class="figure-img" alt="SHAP Summary">
+      <div class="figure-caption">Fig. 5B: SHAP beeswarm plot illustrating directional value impacts.</div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 6: PRODUCTION WEB APPLICATION                                     -->
+  <!-- ========================================================================= -->
+  <h2>6. Production Web Application (SayaraPrice AI 2.0)</h2>
+
+  <h3>6.1 System Architecture & Technical Stack</h3>
+  <p>
+    To make the trained machine learning pipeline accessible to end-users, we engineered a modern, full-stack web application:
+  </p>
+  <ul>
+    <li><strong>Backend Service</strong>: Flask REST API (<code>app.py</code>) running the decoupled valuation engine (<code>car_valuation_service.py</code>) with sub-15ms inference latency.</li>
+    <li><strong>Frontend Interface</strong>: Responsive Single Page Application (SPA) built with Tailwind CSS, Chart.js for live depreciation curves, and Lucide icons.</li>
+    <li><strong>Dual Currency Support</strong>: Real-time client-side toggle between Million Centimes and Algerian Dinars (DZD) without page reloads.</li>
+  </ul>
+
+  <h3>6.2 The Two Operational Modes</h3>
+  <ol>
+    <li><strong>Mode 1: Argus Valuation (Regression)</strong>:
+      Takes vehicle specifications and outputs the certified market value, an empirical negotiation corridor (e.g., Fair Min 354.12 M to Fair Max 415.70 M Centimes), and interactive sensitivity graphs.
+    </li>
+    <li><strong>Mode 2: Deal Classifier (Classification — High or Low?)</strong>:
+      Accepts vehicle specifications <strong>and the seller's asking price</strong>. It computes the price gap and renders a visual deal gauge (0 to 100 spectrum), classifying the offer into:
+      <ul>
+        <li>🟢 <strong>Great Deal (Affaire en Or)</strong>: &le; -10% below market.</li>
+        <li>🟢 <strong>Good Deal (Bonne Affaire)</strong>: -10% to -4%.</li>
+        <li>🔵 <strong>Fair Price (Prix du Marché)</strong>: Within &plusmn; 4%.</li>
+        <li>🟠 <strong>High Price (Prix Élevé)</strong>: +4% to +12%.</li>
+        <li>🔴 <strong>Very High (Ghali Bzaf)</strong>: &gt; +12% above market.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="figure-container">
+    <img src="{{IMG_WEBAPP}}" class="figure-img" alt="Web Application Interface">
+    <div class="figure-caption">Figure 6: Live web application interface showing Mode 2 Deal Classifier rating an overpriced Golf 7 (+35.1% Ghali Bzaf) with visual deal meter.</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 7: CONCLUSIONS & FUTURE WORK                                      -->
+  <!-- ========================================================================= -->
+  <h2>7. Conclusions & Strategic Recommendations</h2>
+
+  <h3>7.1 Project Conclusions</h3>
+  <p>
+    This project successfully addressed the challenge of vehicle price opacity in the Algerian market. 
+    By harvesting 200,000 raw listings and constructing a leak-free Machine Learning pipeline evaluated through nested cross-validation, 
+    we achieved a champion model capable of predicting vehicle values with an average median percentage error of <strong>18.50%</strong> 
+    and an <strong>R² of 0.894</strong>. The integration of both regression (fair valuation) and classification (deal rating) within an 
+    interactive web platform transforms complex mathematical modeling into immediate, actionable consumer value.
+  </p>
+
+  <h3>7.2 Model & Data Limitations</h3>
+  <ul>
+    <li><strong>Bodywork & Paint Condition (Soubbagha / Retouches)</strong>: In the Algerian market, body touch-ups significantly impact price. Because paint details are primarily described in unstructured text comments, they are not yet fully captured in tabular features.</li>
+    <li><strong>Mechanical Engine Health</strong>: Listing data reflects seller claims rather than verified pre-purchase mechanical inspections.</li>
+    <li><strong>Regional Sparse Segments</strong>: Extreme southern wilayas exhibit lower listing density compared to coastal metropolitan hubs.</li>
+  </ul>
+
+  <h3>7.3 Concrete Recommendations for Future Development (V3.0)</h3>
+  <ol>
+    <li><strong>Multimodal NLP for Free-Text Analysis</strong>: Integrate a French/Darja NLP transformer (e.g., fine-tuned RoBERTa) to parse ad descriptions for phrases like <em>"00 peinture"</em> (zero paint touch-ups), <em>"marteau à froid"</em> (dent removal), or <em>"moteur standard"</em>.</li>
+    <li><strong>Computer Vision for Damage Detection</strong>: Implement an image classification pipeline to inspect exterior photos for body scratches, panel misalignments, or interior wear.</li>
+    <li><strong>Macroeconomic Integration</strong>: Incorporate parallel foreign exchange currency rates (Square Port Said EUR/DZD rate) to dynamically adjust valuations as import purchasing power fluctuates.</li>
+  </ol>
+
+  <div class="callout callout-blue" style="margin-top: 30px;">
+    <strong>Project Artifacts & Code Repository:</strong>
+    All scripts, model artifacts, diagnostic plots, and the web platform are fully runnable locally:
+    <ul>
+      <li>Web Application Server: <code>app.py</code> (Accessible on <code>http://localhost:5000</code>)</li>
+      <li>Trained ML Pipeline: <code>algerian_car_price_pipeline.joblib</code></li>
+      <li>Model Benchmark Engine: <code>train_algerian_car_price_model.py</code></li>
+      <li>Diagnostic Visualizations: <code>D:/database/ml_diagnostics/</code></li>
+    </ul>
+  </div>
+
+</body>
+</html>

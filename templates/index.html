@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50 text-slate-800">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoteDZ — Algerian Automotive Market Valuation & Deal Checker</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
+            },
+            deal: {
+              great: '#059669', // Emerald
+              good: '#10b981',  // Mint Green
+              fair: '#2563eb',  // Royal Blue
+              high: '#d97706',  // Amber
+              overpriced: '#dc2626' // Crimson Red
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    }
+    /* Clean, professional custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Segmented meter indicator animation */
+    .meter-pointer {
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="h-full min-h-screen bg-[#f8fafc] flex flex-col text-slate-800 antialiased font-sans">
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION HEADER                                                     -->
+  <!-- ========================================================================= -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Product Identity -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-xs">
+          <i data-lucide="car" class="w-5 h-5 text-sky-400"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-lg text-slate-900 tracking-tight">Cote<span class="text-sky-600">DZ</span></span>
+            <span class="text-[11px] font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">Algeria Market</span>
+          </div>
+          <p class="text-xs text-slate-500 hidden sm:block">Automotive Fair Market Valuation & Price Verification</p>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs (Separated Functions) -->
+      <nav class="flex items-center space-x-1 sm:space-x-2 bg-slate-100/80 p-1 rounded-xl border border-slate-200">
+        <button onclick="switchTab('estimator')" id="tab-btn-estimator" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-slate-900 shadow-xs flex items-center gap-1.5">
+          <i data-lucide="line-chart" class="w-4 h-4 text-sky-600"></i>
+          <span>Price Estimator</span>
+        </button>
+
+        <button onclick="switchTab('checker')" id="tab-btn-checker" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 hover:bg-white/50 flex items-center gap-1.5">
+          <i data-lucide="tag" class="w-4 h-4 text-emerald-600"></i>
+          <span>Deal Checker</span>
+        </button>
+
+        <button onclick="switchTab('batch')" id="tab-btn-batch" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-white/50 flex items-center gap-1.5">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-slate-500"></i>
+          <span class="hidden md:inline">Batch CSV</span>
+        </button>
+
+        <button onclick="switchTab('methodology')" id="tab-btn-methodology" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-white/50 flex items-center gap-1.5">
+          <i data-lucide="database" class="w-4 h-4 text-slate-500"></i>
+          <span class="hidden lg:inline">Methodology</span>
+        </button>
+      </nav>
+
+      <!-- Currency Switcher Toggle -->
+      <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-semibold">
+        <button onclick="setCurrency('centimes')" id="curr-btn-centimes" class="px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs transition-all">
+          Million Centimes
+        </button>
+        <button onclick="setCurrency('dzd')" id="curr-btn-dzd" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition-all">
+          DZD (Dinars)
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN CONTENT CONTAINER                                                    -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ======================================================================= -->
+    <!-- FUNCTION 1: FAIR PRICE ESTIMATOR (REGRESSION ONLY)                      -->
+    <!-- ======================================================================= -->
+    <div id="view-estimator" class="space-y-6">
+
+      <!-- Section Banner -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-100">
+              Tool 1: Market Valuation
+            </span>
+            <span class="text-xs text-slate-400">100,000+ Verified Algerian Transactions</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Fair Market Value Estimator</h1>
+          <p class="text-sm text-slate-500 mt-1">
+            Estimate what a vehicle is worth in Algeria based on its age, mileage, fuel type, transmission, and wilaya.
+          </p>
+        </div>
+
+        <button onclick="switchTab('checker')" class="self-start md:self-auto text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3.5 py-2 rounded-xl border border-emerald-200 flex items-center gap-1.5 transition-colors">
+          <span>Already have an asking price? Check if it's High or Low</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        <span class="text-slate-500 font-medium whitespace-nowrap">Popular Presets:</span>
+        <button onclick="loadEstimatorPreset('clio4')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-xs transition-colors">Renault Clio 4 (2018)</button>
+        <button onclick="loadEstimatorPreset('golf7')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-xs transition-colors">VW Golf 7 (2019)</button>
+        <button onclick="loadEstimatorPreset('duster')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-xs transition-colors">Dacia Duster (2021)</button>
+        <button onclick="loadEstimatorPreset('picanto')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-xs transition-colors">Kia Picanto (2020)</button>
+        <button onclick="loadEstimatorPreset('coolray')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-xs transition-colors">Geely Coolray (2024)</button>
+        <button onclick="loadEstimatorPreset('tucson')" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-xs transition-colors">Hyundai Tucson (2022)</button>
+      </div>
+
+      <!-- Two-Column Layout (Form on Left, Live Valuation on Right) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Estimator Form -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+          <h2 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+            <span>Vehicle Specifications</span>
+            <span class="text-xs font-normal text-slate-400">All fields required</span>
+          </h2>
+
+          <form id="form-estimator" onsubmit="handleEstimatorSubmit(event)" class="space-y-4">
+            
+            <!-- Brand & Model -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Make / Brand</label>
+                <select id="est-brand" onchange="onEstBrandChange()" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+                  <option value="" disabled selected>Select Brand</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Model</label>
+                <select id="est-model" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+                  <option value="" disabled selected>Select Model</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Year & Mileage -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Year</label>
+                <input type="number" id="est-year" min="1990" max="2026" value="2018" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Mileage (km)</label>
+                <input type="number" id="est-mileage" min="0" max="800000" step="1000" value="120000" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+              </div>
+            </div>
+
+            <!-- Fuel & Transmission -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Fuel Type</label>
+                <select id="est-fuel" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+                  <option value="Diesel">Diesel</option>
+                  <option value="Petrol" selected>Petrol (Essence)</option>
+                  <option value="LPG">LPG (GPL / Gaz)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Transmission</label>
+                <select id="est-transmission" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+                  <option value="Manual" selected>Manual</option>
+                  <option value="Automatic">Automatic</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Wilaya -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Wilaya (Province)</label>
+              <select id="est-wilaya" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all">
+                <option value="" disabled selected>Select Wilaya</option>
+              </select>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btn-est-submit" class="w-full mt-2 py-3 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm shadow-xs transition-all flex items-center justify-center gap-2">
+              <i data-lucide="calculator" class="w-4 h-4"></i>
+              <span>Calculate Fair Market Value</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Right: Estimator Results -->
+        <div class="lg:col-span-7 space-y-5">
+          
+          <!-- Empty State -->
+          <div id="est-placeholder" class="bg-white p-12 rounded-2xl border border-slate-200 text-center shadow-xs min-h-[380px] flex flex-col items-center justify-center">
+            <div class="w-16 h-16 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center mb-4">
+              <i data-lucide="badge-dollar-sign" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900">Ready to Value Your Car</h3>
+            <p class="text-xs text-slate-500 max-w-sm mt-1 mb-6">
+              Select a preset above or fill in the vehicle details on the left to compute the average Algerian market value and negotiation range.
+            </p>
+            <button onclick="loadEstimatorPreset('clio4')" class="text-xs font-semibold text-sky-600 hover:text-sky-700 underline">
+              Click here to test with a 2018 Renault Clio 4 &rarr;
+            </button>
+          </div>
+
+          <!-- Valuation Output Card -->
+          <div id="est-results-card" class="hidden space-y-5">
+            
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <div>
+                  <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Estimated Fair Value</span>
+                  <h3 id="est-car-title" class="text-base font-bold text-slate-900 mt-0.5">Renault Clio 4 (2018)</h3>
+                </div>
+                <span class="text-xs px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 font-semibold border border-sky-100">
+                  Market Consensus
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+                <!-- Large Price Callout -->
+                <div>
+                  <div class="text-3xl sm:text-4xl font-extrabold text-slate-900" id="est-primary-price">
+                    --
+                  </div>
+                  <div class="text-xs font-medium text-slate-500 mt-1" id="est-secondary-price">
+                    --
+                  </div>
+                </div>
+
+                <!-- Negotiation Corridor Box -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2">
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                    <span>Negotiation Corridor:</span>
+                    <span class="text-slate-400 font-normal">±8% spread</span>
+                  </div>
+                  <div class="flex items-center justify-between text-sm font-bold text-slate-900">
+                    <div>
+                      <span class="text-[10px] uppercase font-semibold text-emerald-600 block">Fair Low</span>
+                      <span id="est-corridor-low">--</span>
+                    </div>
+                    <span class="text-slate-400 font-normal">⟷</span>
+                    <div class="text-right">
+                      <span class="text-[10px] uppercase font-semibold text-amber-600 block">Fair High</span>
+                      <span id="est-corridor-high">--</span>
+                    </div>
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-tight">
+                    Transactions above <strong id="est-corridor-max" class="text-slate-700">--</strong> typically represent overpriced vehicles unless exceptional conditions apply.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Vehicle Badges -->
+              <div class="mt-5 pt-4 border-t border-slate-100 flex flex-wrap gap-2 text-xs" id="est-pills">
+                <!-- Dynamic Pills -->
+              </div>
+            </div>
+
+            <!-- Depreciation Graph Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="trending-down" class="w-4 h-4 text-slate-500"></i>
+                  <span>Depreciation Sensitivity Curve</span>
+                </h4>
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
+                  <button onclick="toggleEstChart('age')" id="est-chart-tab-age" class="px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs">By Year</button>
+                  <button onclick="toggleEstChart('mileage')" id="est-chart-tab-mileage" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900">By Mileage</button>
+                </div>
+              </div>
+
+              <div class="h-60 w-full">
+                <canvas id="estDepreciationChart"></canvas>
+              </div>
+              <p class="text-xs text-slate-400 mt-2 text-center">
+                Market valuation curve simulating how this specific model depreciates across age and odometer readings.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- FUNCTION 2: DEAL CHECKER / HIGH OR LOW RATER (CLASSIFICATION ONLY)     -->
+    <!-- ======================================================================= -->
+    <div id="view-checker" class="hidden space-y-6">
+
+      <!-- Section Banner -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+              Tool 2: Deal & Price Verifier
+            </span>
+            <span class="text-xs text-slate-400">Is this car a bargain or overpriced?</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Deal Checker: Is the Asking Price High or Low?</h1>
+          <p class="text-sm text-slate-500 mt-1">
+            Enter the car's specifications <strong>and the seller's asking price</strong> to instantly see if the offer is a Great Deal, Fair, or Overpriced (Ghali).
+          </p>
+        </div>
+
+        <button onclick="switchTab('estimator')" class="self-start md:self-auto text-xs font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-3.5 py-2 rounded-xl border border-sky-200 flex items-center gap-1.5 transition-colors">
+          <span>Need a valuation without an asking price?</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+      <!-- Quick Test Scenarios -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        <span class="text-slate-500 font-medium whitespace-nowrap">Test Scenarios:</span>
+        <button onclick="loadCheckerScenario('great_deal')" class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-medium whitespace-nowrap shadow-xs transition-colors">
+          🟢 Great Deal (Picanto @ 220 M)
+        </button>
+        <button onclick="loadCheckerScenario('fair_deal')" class="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-medium whitespace-nowrap shadow-xs transition-colors">
+          🔵 Fair Market (Clio 4 @ 340 M)
+        </button>
+        <button onclick="loadCheckerScenario('overpriced')" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 font-medium whitespace-nowrap shadow-xs transition-colors">
+          🔴 Overpriced / Ghali (Golf 7 @ 520 M)
+        </button>
+      </div>
+
+      <!-- Two-Column Layout (Inputs on Left, Verdict on Right) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Deal Input Form -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
+          
+          <!-- Step 1: Car Specs -->
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center">1</span>
+              <span>Vehicle Information</span>
+            </h2>
+
+            <form id="form-checker" onsubmit="handleCheckerSubmit(event)" class="space-y-4">
+              
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Make / Brand</label>
+                  <select id="chk-brand" onchange="onChkBrandChange()" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                    <option value="" disabled selected>Select Brand</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Model</label>
+                  <select id="chk-model" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                    <option value="" disabled selected>Select Model</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Year</label>
+                  <input type="number" id="chk-year" min="1990" max="2026" value="2019" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Mileage (km)</label>
+                  <input type="number" id="chk-mileage" min="0" max="800000" step="1000" value="95000" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Fuel Type</label>
+                  <select id="chk-fuel" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                    <option value="Diesel" selected>Diesel</option>
+                    <option value="Petrol">Petrol (Essence)</option>
+                    <option value="LPG">LPG (GPL / Gaz)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Transmission</label>
+                  <select id="chk-transmission" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                    <option value="Manual" selected>Manual</option>
+                    <option value="Automatic">Automatic</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Wilaya (Province)</label>
+                <select id="chk-wilaya" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                  <option value="" disabled selected>Select Wilaya</option>
+                </select>
+              </div>
+
+              <!-- Step 2: Asking Price -->
+              <div class="pt-4 border-t border-slate-100">
+                <h2 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center">2</span>
+                  <span>Seller's Asking Price</span>
+                </h2>
+
+                <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <label class="block text-xs font-bold text-slate-900">Advertised Price</label>
+                    <select id="chk-price-unit" class="text-xs font-semibold bg-white border border-slate-300 rounded px-2 py-0.5 text-slate-700 focus:outline-none">
+                      <option value="million" selected>Million Centimes</option>
+                      <option value="dzd">DZD (Dinars)</option>
+                    </select>
+                  </div>
+
+                  <div class="relative">
+                    <input type="number" id="chk-asking-price" step="any" placeholder="e.g. 520 (Millions) or 5200000 (DZD)" required class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-base font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all">
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-1.5">
+                    This asking price will be compared against fair market distributions.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Check Deal Button -->
+              <button type="submit" id="btn-chk-submit" class="w-full mt-3 py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-xs transition-all flex items-center justify-center gap-2">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <span>Evaluate Deal (Is it High or Low?)</span>
+              </button>
+
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Right: Deal Verdict Results -->
+        <div class="lg:col-span-7 space-y-5">
+          
+          <!-- Empty State -->
+          <div id="chk-placeholder" class="bg-white p-12 rounded-2xl border border-slate-200 text-center shadow-xs min-h-[460px] flex flex-col items-center justify-center">
+            <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+              <i data-lucide="badge-percent" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900">No Deal Evaluated Yet</h3>
+            <p class="text-xs text-slate-500 max-w-sm mt-1 mb-6">
+              Enter vehicle specs and the seller's asking price to view the visual deal meter, price difference, and negotiation verdict.
+            </p>
+            <div class="flex gap-2">
+              <button onclick="loadCheckerScenario('great_deal')" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200">Test Great Deal</button>
+              <button onclick="loadCheckerScenario('overpriced')" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200">Test Overpriced Car</button>
+            </div>
+          </div>
+
+          <!-- Deal Verdict Card -->
+          <div id="chk-results-card" class="hidden space-y-5">
+            
+            <!-- Primary Verdict Banner -->
+            <div id="chk-verdict-box" class="p-6 rounded-2xl border shadow-xs transition-all">
+              
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-200/60">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Deal Evaluation Verdict</span>
+                  <h3 id="chk-badge-title" class="text-2xl font-black text-slate-900 mt-0.5">
+                    Very High (Ghali Bzaf)
+                  </h3>
+                  <p id="chk-verdict-summary" class="text-xs text-slate-600 mt-1 font-medium">
+                    This car is priced well above fair market value.
+                  </p>
+                </div>
+
+                <!-- Price Difference Badge -->
+                <div class="sm:text-right bg-white/80 p-3 rounded-xl border border-slate-200/60 min-w-[150px]">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 block">Price Gap</span>
+                  <div id="chk-diff-pct" class="text-xl font-black text-rose-600">+35.1%</div>
+                  <div id="chk-diff-amount" class="text-xs font-semibold text-slate-700">+135.1 M Centimes</div>
+                </div>
+              </div>
+
+              <!-- SEGMENTED AUTOMOTIVE DEAL METER -->
+              <div class="space-y-2 mb-5">
+                <div class="flex justify-between text-[11px] font-bold text-slate-500">
+                  <span>Great Deal</span>
+                  <span>Good Deal</span>
+                  <span>Fair Price</span>
+                  <span>High Price</span>
+                  <span>Overpriced</span>
+                </div>
+
+                <!-- 5-Segment Bar -->
+                <div class="grid grid-cols-5 gap-1.5 h-3">
+                  <div id="segment-great" class="rounded-l-md bg-emerald-500 transition-opacity opacity-30"></div>
+                  <div id="segment-good" class="bg-emerald-400 transition-opacity opacity-30"></div>
+                  <div id="segment-fair" class="bg-blue-500 transition-opacity opacity-30"></div>
+                  <div id="segment-high" class="bg-amber-500 transition-opacity opacity-30"></div>
+                  <div id="segment-overpriced" class="rounded-r-md bg-rose-600 transition-opacity opacity-30"></div>
+                </div>
+
+                <div class="flex justify-between text-[10px] text-slate-400">
+                  <span>&le; -10% below</span>
+                  <span>-10% to -4%</span>
+                  <span>&plusmn; 4% market</span>
+                  <span>+4% to +12%</span>
+                  <span>&gt; +12% above</span>
+                </div>
+              </div>
+
+              <!-- Price Comparison Table -->
+              <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200/60 text-xs">
+                <div class="bg-white/80 p-3 rounded-xl border border-slate-200/60">
+                  <span class="text-slate-500 text-[11px] block">Seller's Asking Price:</span>
+                  <div id="chk-display-asking" class="text-lg font-black text-slate-900 mt-0.5">520.00 M Centimes</div>
+                  <div id="chk-display-asking-sub" class="text-[11px] text-slate-500">5,200,000 DZD</div>
+                </div>
+
+                <div class="bg-white/80 p-3 rounded-xl border border-slate-200/60">
+                  <span class="text-slate-500 text-[11px] block">Fair Market Value (Cote):</span>
+                  <div id="chk-display-fair" class="text-lg font-black text-sky-700 mt-0.5">384.91 M Centimes</div>
+                  <div id="chk-display-fair-sub" class="text-[11px] text-slate-500">3,849,000 DZD</div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Actionable Negotiation Advice -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+              <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i>
+                <span>Market Negotiation Advice</span>
+              </h4>
+              <p id="chk-advice-text" class="text-xs text-slate-600 leading-relaxed">
+                <!-- Dynamic text -->
+              </p>
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span class="text-slate-500">Suggested Target Counter-Offer:</span>
+                <span id="chk-target-price" class="font-bold text-slate-900">--</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- FUNCTION 3: BATCH CSV EVALUATION                                        -->
+    <!-- ======================================================================= -->
+    <div id="view-batch" class="hidden space-y-6">
+      
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Bulk CSV Vehicle Evaluation</h2>
+          <p class="text-xs text-slate-500 mt-1 max-w-xl">
+            Upload a spreadsheet of vehicles to calculate fair market prices for each row. 
+            If your file includes an <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-800">asking_price</code> column, 
+            each vehicle is automatically classified as a Great Deal, Fair Price, or Overpriced.
+          </p>
+        </div>
+        <a href="/api/template-csv" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-200 flex items-center gap-2 transition-colors self-start md:self-auto">
+          <i data-lucide="download" class="w-4 h-4 text-slate-600"></i>
+          <span>Download Sample CSV</span>
+        </a>
+      </div>
+
+      <!-- File Dropzone -->
+      <div class="bg-white p-8 rounded-2xl border-2 border-dashed border-slate-300 hover:border-slate-400 transition-colors text-center cursor-pointer" onclick="document.getElementById('batch-file-input').click()">
+        <input type="file" id="batch-file-input" accept=".csv" onchange="handleBatchUpload(event)" class="hidden">
+        <div class="max-w-md mx-auto space-y-2">
+          <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mx-auto">
+            <i data-lucide="upload" class="w-6 h-6"></i>
+          </div>
+          <div class="text-sm font-semibold text-slate-900">Click to select CSV or drag and drop file here</div>
+          <div class="text-xs text-slate-400">Supported columns: brand, model, year, mileage_km, fuel_type, transmission, wilaya_code, asking_price (optional)</div>
+        </div>
+      </div>
+
+      <!-- Batch Processing Results -->
+      <div id="batch-results-panel" class="hidden space-y-5">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+            <span class="text-xs text-slate-400 block">Total Vehicles</span>
+            <span class="text-xl font-bold text-slate-900 mt-0.5 block" id="batch-stat-total">0</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+            <span class="text-xs text-slate-400 block">Average Fair Price</span>
+            <span class="text-xl font-bold text-sky-700 mt-0.5 block" id="batch-stat-avg">0 M</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+            <span class="text-xs text-slate-400 block">Great Deals Found</span>
+            <span class="text-xl font-bold text-emerald-600 mt-0.5 block" id="batch-stat-deals">0</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+            <span class="text-xs text-slate-400 block">Overpriced Cars</span>
+            <span class="text-xl font-bold text-rose-600 mt-0.5 block" id="batch-stat-high">0</span>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+          <div class="text-xs font-semibold text-slate-800 flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+            <span>Evaluation finished. Enriched dataset is ready for export.</span>
+          </div>
+          <a id="btn-batch-download" href="#" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Download Evaluated CSV</span>
+          </a>
+        </div>
+
+        <!-- Preview Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="p-4 border-b border-slate-100 text-xs font-bold text-slate-900 flex justify-between">
+            <span>First 10 Preview Rows:</span>
+            <span class="text-slate-400 font-normal">Calculated fair market values & deal tags</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4">Vehicle</th>
+                  <th class="py-3 px-4">Year</th>
+                  <th class="py-3 px-4">Mileage</th>
+                  <th class="py-3 px-4">Fuel</th>
+                  <th class="py-3 px-4">Wilaya</th>
+                  <th class="py-3 px-4">Fair Price</th>
+                  <th class="py-3 px-4">Asking Price</th>
+                  <th class="py-3 px-4">Classification</th>
+                </tr>
+              </thead>
+              <tbody id="batch-table-body" class="divide-y divide-slate-100 font-medium"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================================= -->
+    <!-- FUNCTION 4: METHODOLOGY & MODEL BENCHMARK                               -->
+    <!-- ======================================================================= -->
+    <div id="view-methodology" class="hidden space-y-6">
+
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <h2 class="text-xl font-bold text-slate-900">Machine Learning Modeling & Dataset Methodology</h2>
+        <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
+          The models driving this application were trained on <strong>100,197 verified listings</strong> extracted from Ouedkniss. 
+          To guarantee realistic, leak-free evaluations, all transformations (Target Encoding, Scaling) were fitted inside training partitions 
+          under a 5-Fold Stratified Nested Cross-Validation strategy with Optuna hyperparameter optimization.
+        </p>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Cleaned Dataset</span>
+            <span class="text-lg font-bold text-slate-900">100,197 cars</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Champion Model</span>
+            <span class="text-lg font-bold text-sky-700">CatBoost GBDT</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Median Error (MdAPE)</span>
+            <span class="text-lg font-bold text-emerald-600">18.50%</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Correlation (R²)</span>
+            <span class="text-lg font-bold text-slate-900">0.894</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9-Model Comparative Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-900">Cross-Validation Benchmark (All 9 Evaluated Models)</h3>
+          <span class="text-[11px] text-slate-400">Evaluated on Out-of-Fold Real Currency</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Rank</th>
+                <th class="py-3 px-4">Algorithm</th>
+                <th class="py-3 px-4">MAE (Million Centimes)</th>
+                <th class="py-3 px-4">MdAPE (%)</th>
+                <th class="py-3 px-4">R² Score</th>
+                <th class="py-3 px-4">Status</th>
+              </tr>
+            </thead>
+            <tbody id="benchmark-table-body" class="divide-y divide-slate-100 font-medium"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Diagnostic Visualizations -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <h3 class="text-sm font-bold text-slate-900 mb-4">Diagnostics & Interpretability Gallery</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="diagnostics-gallery">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: IMAGE INSPECTION                                                   -->
+  <!-- ========================================================================= -->
+  <div id="image-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4" onclick="closeImageModal()">
+    <div class="max-w-4xl w-full bg-white border border-slate-200 rounded-2xl overflow-hidden p-5 space-y-3 shadow-xl" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h5 class="text-sm font-bold text-slate-900" id="modal-img-title">Diagnostic Chart</h5>
+        <button onclick="closeImageModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="max-h-[75vh] overflow-auto flex items-center justify-center">
+        <img id="modal-img-src" src="" alt="Diagnostic" class="rounded-lg max-h-[70vh] object-contain">
+      </div>
+      <p class="text-xs text-slate-500" id="modal-img-desc"></p>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT APPLICATION CONTROLLER                                         -->
+  <!-- ========================================================================= -->
+  <script>
+    // State
+    let catalog = { sorted_brands: [], brand_models: {}, wilayas: {} };
+    let activeTab = 'estimator'; // 'estimator' | 'checker' | 'batch' | 'methodology'
+    let activeCurrency = 'centimes'; // 'centimes' | 'dzd'
+    let currentEstResult = null;
+    let currentChkResult = null;
+    let estChart = null;
+    let estChartMetric = 'age';
+
+    // Preset configurations
+    const PRESETS = {
+      clio4: { brand: 'Renault', model: 'Clio 4', year: 2018, mileage_km: 120000, fuel_type: 'Diesel', transmission: 'Manual', wilaya_code: 16, asking_price: 340 },
+      golf7: { brand: 'Volkswagen', model: 'Golf 7', year: 2019, mileage_km: 95000, fuel_type: 'Diesel', transmission: 'Manual', wilaya_code: 31, asking_price: 520 },
+      duster: { brand: 'Dacia', model: 'Duster', year: 2021, mileage_km: 65000, fuel_type: 'Diesel', transmission: 'Manual', wilaya_code: 19, asking_price: 395 },
+      picanto: { brand: 'Kia', model: 'Picanto', year: 2020, mileage_km: 50000, fuel_type: 'Petrol', transmission: 'Automatic', wilaya_code: 25, asking_price: 220 },
+      coolray: { brand: 'Geely', model: 'Coolray', year: 2024, mileage_km: 12000, fuel_type: 'Petrol', transmission: 'Automatic', wilaya_code: 16, asking_price: 430 },
+      tucson: { brand: 'Hyundai', model: 'Tucson', year: 2022, mileage_km: 40000, fuel_type: 'Diesel', transmission: 'Automatic', wilaya_code: 9, asking_price: 680 }
+    };
+
+    // Scenarios for Tool 2 (Deal Checker)
+    const SCENARIOS = {
+      great_deal: { brand: 'Kia', model: 'Picanto', year: 2020, mileage_km: 50000, fuel_type: 'Petrol', transmission: 'Automatic', wilaya_code: 25, asking_price: 220 },
+      fair_deal: { brand: 'Renault', model: 'Clio 4', year: 2018, mileage_km: 120000, fuel_type: 'Diesel', transmission: 'Manual', wilaya_code: 16, asking_price: 340 },
+      overpriced: { brand: 'Volkswagen', model: 'Golf 7', year: 2019, mileage_km: 95000, fuel_type: 'Diesel', transmission: 'Manual', wilaya_code: 31, asking_price: 520 }
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      await loadCatalog();
+      await loadMethodology();
+      switchTab('estimator');
+    });
+
+    // 1. Catalog & Dropdowns
+    async function loadCatalog() {
+      try {
+        const resp = await fetch('/api/catalog');
+        const data = await resp.json();
+        if (data.status === 'success') {
+          catalog = data.catalog;
+          initDropdowns();
+        }
+      } catch (e) {
+        console.error('Catalog load failure:', e);
+      }
+    }
+
+    function initDropdowns() {
+      ['est', 'chk'].forEach(prefix => {
+        const brandSel = document.getElementById(`${prefix}-brand`);
+        brandSel.innerHTML = '<option value="" disabled selected>Select Brand</option>';
+        catalog.sorted_brands.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b;
+          opt.textContent = b;
+          brandSel.appendChild(opt);
+        });
+
+        const wilayaSel = document.getElementById(`${prefix}-wilaya`);
+        wilayaSel.innerHTML = '<option value="" disabled selected>Select Wilaya</option>';
+        const keys = Object.keys(catalog.wilayas || {}).sort((a,b) => parseInt(a) - parseInt(b));
+        keys.forEach(k => {
+          const opt = document.createElement('option');
+          opt.value = k;
+          opt.textContent = `${k.padStart(2, '0')} - ${catalog.wilayas[k]}`;
+          if (k === "16") opt.selected = true; // Alger
+          wilayaSel.appendChild(opt);
+        });
+      });
+
+      // Default values
+      document.getElementById('est-brand').value = 'Renault';
+      onEstBrandChange();
+      document.getElementById('est-model').value = 'Clio 4';
+
+      document.getElementById('chk-brand').value = 'Volkswagen';
+      onChkBrandChange();
+      document.getElementById('chk-model').value = 'Golf 7';
+      document.getElementById('chk-asking-price').value = '520';
+    }
+
+    function onEstBrandChange() {
+      populateModelDropdown('est');
+    }
+
+    function onChkBrandChange() {
+      populateModelDropdown('chk');
+    }
+
+    function populateModelDropdown(prefix) {
+      const brand = document.getElementById(`${prefix}-brand`).value;
+      const modelSel = document.getElementById(`${prefix}-model`);
+      modelSel.innerHTML = '<option value="" disabled selected>Select Model</option>';
+
+      const models = (catalog.brand_models && catalog.brand_models[brand]) ? catalog.brand_models[brand] : ['Standard'];
+      models.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        modelSel.appendChild(opt);
+      });
+      if (models.length > 0) modelSel.selectedIndex = 1;
+    }
+
+    // 2. Navigation Tabs (Clear separation of tools)
+    function switchTab(tabId) {
+      activeTab = tabId;
+
+      ['estimator', 'checker', 'batch', 'methodology'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (view) view.classList.toggle('hidden', t !== tabId);
+
+        if (btn) {
+          if (t === tabId) {
+            btn.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-slate-900 shadow-xs flex items-center gap-1.5";
+          } else {
+            btn.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 hover:bg-white/50 flex items-center gap-1.5";
+          }
+        }
+      });
+
+      lucide.createIcons();
+    }
+
+    // 3. Currency Formatting
+    function setCurrency(curr) {
+      activeCurrency = curr;
+      document.getElementById('curr-btn-centimes').className = curr === 'centimes'
+        ? "px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs transition-all font-semibold"
+        : "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition-all";
+      document.getElementById('curr-btn-dzd').className = curr === 'dzd'
+        ? "px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs transition-all font-semibold"
+        : "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition-all";
+
+      if (currentEstResult) renderEstResults();
+      if (currentChkResult) renderChkResults();
+    }
+
+    function formatCurrency(million, dzd) {
+      if (activeCurrency === 'centimes') {
+        return `${Number(million).toFixed(2)} M Centimes`;
+      } else {
+        const d = dzd || (million * 10000);
+        return `${Number(d).toLocaleString('fr-FR')} DZD`;
+      }
+    }
+
+    // 4. Function 1: Estimator Execution
+    function loadEstimatorPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      document.getElementById('est-brand').value = p.brand;
+      onEstBrandChange();
+      document.getElementById('est-model').value = p.model;
+      document.getElementById('est-year').value = p.year;
+      document.getElementById('est-mileage').value = p.mileage_km;
+      document.getElementById('est-fuel').value = p.fuel_type;
+      document.getElementById('est-transmission').value = p.transmission;
+      document.getElementById('est-wilaya').value = p.wilaya_code;
+      submitEstimator();
+    }
+
+    async function handleEstimatorSubmit(e) {
+      e.preventDefault();
+      await submitEstimator();
+    }
+
+    async function submitEstimator() {
+      const payload = {
+        brand: document.getElementById('est-brand').value,
+        model: document.getElementById('est-model').value,
+        year: parseInt(document.getElementById('est-year').value),
+        mileage_km: parseFloat(document.getElementById('est-mileage').value),
+        fuel_type: document.getElementById('est-fuel').value,
+        transmission: document.getElementById('est-transmission').value,
+        wilaya_code: parseInt(document.getElementById('est-wilaya').value)
+      };
+
+      const btn = document.getElementById('btn-est-submit');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Calculating Valuation...`;
+      lucide.createIcons();
+
+      try {
+        const resp = await fetch('/api/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const res = await resp.json();
+        if (res.status === 'success') {
+          currentEstResult = res.data;
+          renderEstResults();
+        } else {
+          alert('Error: ' + res.message);
+        }
+      } catch (err) {
+        console.error('Estimator error:', err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="calculator" class="w-4 h-4"></i> <span>Calculate Fair Market Value</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    function renderEstResults() {
+      if (!currentEstResult) return;
+      document.getElementById('est-placeholder').classList.add('hidden');
+      document.getElementById('est-results-card').classList.remove('hidden');
+
+      const data = currentEstResult;
+      document.getElementById('est-car-title').textContent = `${data.brand} ${data.model} (${data.year})`;
+
+      // Main Price
+      document.getElementById('est-primary-price').textContent = formatCurrency(data.predicted_price_million_centimes, data.predicted_price_dzd);
+      document.getElementById('est-secondary-price').textContent = activeCurrency === 'centimes'
+        ? `Equivalent in Algerian Dinars: ${Number(data.predicted_price_dzd).toLocaleString('fr-FR')} DZD`
+        : `Equivalent in Centimes: ${Number(data.predicted_price_million_centimes).toFixed(2)} Million Centimes`;
+
+      // Corridor
+      const corr = data.corridor;
+      document.getElementById('est-corridor-low').textContent = formatCurrency(corr.low_million_centimes, corr.low_dzd);
+      document.getElementById('est-corridor-high').textContent = formatCurrency(corr.high_million_centimes, corr.high_dzd);
+      document.getElementById('est-corridor-max').textContent = formatCurrency(corr.high_million_centimes, corr.high_dzd);
+
+      // Pills
+      const pills = document.getElementById('est-pills');
+      pills.innerHTML = `
+        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium">Year ${data.year}</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium">${Number(data.mileage_km).toLocaleString()} km</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium">${data.fuel_type}</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium">${data.transmission}</span>
+        <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 font-medium">${data.wilaya_name}</span>
+      `;
+
+      renderEstChart();
+      lucide.createIcons();
+    }
+
+    function toggleEstChart(metric) {
+      estChartMetric = metric;
+      document.getElementById('est-chart-tab-age').className = metric === 'age'
+        ? "px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs"
+        : "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900";
+      document.getElementById('est-chart-tab-mileage').className = metric === 'mileage'
+        ? "px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-xs"
+        : "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900";
+
+      renderEstChart();
+    }
+
+    function renderEstChart() {
+      if (!currentEstResult || !currentEstResult.curves) return;
+      const ctx = document.getElementById('estDepreciationChart').getContext('2d');
+      if (estChart) estChart.destroy();
+
+      let labels = [];
+      let points = [];
+
+      if (estChartMetric === 'age') {
+        const curve = currentEstResult.curves.age_curve || [];
+        labels = curve.map(c => c.year);
+        points = curve.map(c => activeCurrency === 'centimes' ? c.price_million : c.price_million * 10000);
+      } else {
+        const curve = currentEstResult.curves.mileage_curve || [];
+        labels = curve.map(c => `${(c.mileage_km / 1000).toFixed(0)}k km`);
+        points = curve.map(c => activeCurrency === 'centimes' ? c.price_million : c.price_million * 10000);
+      }
+
+      estChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: activeCurrency === 'centimes' ? 'Market Value (M Centimes)' : 'Market Value (DZD)',
+            data: points,
+            borderColor: '#0284c7',
+            backgroundColor: 'rgba(2, 132, 199, 0.06)',
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: '#0284c7',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { color: '#f1f5f9' },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            },
+            y: {
+              grid: { color: '#f1f5f9' },
+              ticks: {
+                color: '#64748b',
+                font: { size: 10 },
+                callback: function(v) {
+                  return activeCurrency === 'centimes' ? `${v} M` : `${(v/1000).toFixed(0)}k`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 5. Function 2: Deal Checker Execution
+    function loadCheckerScenario(type) {
+      const s = SCENARIOS[type];
+      if (!s) return;
+      document.getElementById('chk-brand').value = s.brand;
+      onChkBrandChange();
+      document.getElementById('chk-model').value = s.model;
+      document.getElementById('chk-year').value = s.year;
+      document.getElementById('chk-mileage').value = s.mileage_km;
+      document.getElementById('chk-fuel').value = s.fuel_type;
+      document.getElementById('chk-transmission').value = s.transmission;
+      document.getElementById('chk-wilaya').value = s.wilaya_code;
+      document.getElementById('chk-asking-price').value = s.asking_price;
+      submitChecker();
+    }
+
+    async function handleCheckerSubmit(e) {
+      e.preventDefault();
+      await submitChecker();
+    }
+
+    async function submitChecker() {
+      const payload = {
+        brand: document.getElementById('chk-brand').value,
+        model: document.getElementById('chk-model').value,
+        year: parseInt(document.getElementById('chk-year').value),
+        mileage_km: parseFloat(document.getElementById('chk-mileage').value),
+        fuel_type: document.getElementById('chk-fuel').value,
+        transmission: document.getElementById('chk-transmission').value,
+        wilaya_code: parseInt(document.getElementById('chk-wilaya').value),
+        asking_price: parseFloat(document.getElementById('chk-asking-price').value),
+        price_unit: document.getElementById('chk-price-unit').value
+      };
+
+      const btn = document.getElementById('btn-chk-submit');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Checking Asking Price...`;
+      lucide.createIcons();
+
+      try {
+        const resp = await fetch('/api/classify_deal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const res = await resp.json();
+        if (res.status === 'success') {
+          currentChkResult = res.data;
+          renderChkResults();
+        } else {
+          alert('Error: ' + res.message);
+        }
+      } catch (err) {
+        console.error('Checker error:', err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> <span>Evaluate Deal (Is it High or Low?)</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    function renderChkResults() {
+      if (!currentChkResult) return;
+      document.getElementById('chk-placeholder').classList.add('hidden');
+      document.getElementById('chk-results-card').classList.remove('hidden');
+
+      const data = currentChkResult;
+      const key = data.rating_key;
+      const pct = data.difference_pct;
+      const diffM = data.difference_million_centimes;
+      const diffD = data.difference_dzd;
+
+      // Verdict Box Styling
+      const vBox = document.getElementById('chk-verdict-box');
+      const bTitle = document.getElementById('chk-badge-title');
+      const diffPctEl = document.getElementById('chk-diff-pct');
+      const diffAmtEl = document.getElementById('chk-diff-amount');
+
+      bTitle.textContent = data.rating_title;
+      diffPctEl.textContent = `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`;
+      diffAmtEl.textContent = diffM > 0
+        ? `+${diffM.toFixed(1)} M (+${Math.abs(diffD).toLocaleString()} DZD)`
+        : `${diffM.toFixed(1)} M (${Math.abs(diffD).toLocaleString()} DZD savings)`;
+
+      // Segment indicator highlighting
+      const segments = ['great', 'good', 'fair', 'high', 'overpriced'];
+      segments.forEach(s => {
+        const el = document.getElementById(`segment-${s}`);
+        if (el) el.classList.remove('opacity-100', 'ring-2', 'ring-offset-2');
+        if (el) el.classList.add('opacity-30');
+      });
+
+      if (key === 'GREAT_DEAL') {
+        vBox.className = "p-6 rounded-2xl border bg-emerald-50/60 border-emerald-200 shadow-xs";
+        bTitle.className = "text-2xl font-black text-emerald-900 mt-0.5";
+        diffPctEl.className = "text-xl font-black text-emerald-700";
+        highlightSegment('great', 'ring-emerald-600');
+      } else if (key === 'GOOD_DEAL') {
+        vBox.className = "p-6 rounded-2xl border bg-teal-50/60 border-teal-200 shadow-xs";
+        bTitle.className = "text-2xl font-black text-teal-900 mt-0.5";
+        diffPctEl.className = "text-xl font-black text-teal-700";
+        highlightSegment('good', 'ring-teal-600');
+      } else if (key === 'FAIR_PRICE') {
+        vBox.className = "p-6 rounded-2xl border bg-blue-50/60 border-blue-200 shadow-xs";
+        bTitle.className = "text-2xl font-black text-blue-900 mt-0.5";
+        diffPctEl.className = "text-xl font-black text-blue-700";
+        highlightSegment('fair', 'ring-blue-600');
+      } else if (key === 'HIGH_PRICE') {
+        vBox.className = "p-6 rounded-2xl border bg-amber-50/60 border-amber-200 shadow-xs";
+        bTitle.className = "text-2xl font-black text-amber-900 mt-0.5";
+        diffPctEl.className = "text-xl font-black text-amber-700";
+        highlightSegment('high', 'ring-amber-600');
+      } else {
+        vBox.className = "p-6 rounded-2xl border bg-rose-50/60 border-rose-200 shadow-xs";
+        bTitle.className = "text-2xl font-black text-rose-900 mt-0.5";
+        diffPctEl.className = "text-xl font-black text-rose-700";
+        highlightSegment('overpriced', 'ring-rose-600');
+      }
+
+      // Comparison Table
+      document.getElementById('chk-display-asking').textContent = formatCurrency(data.asking_price_million_centimes, data.asking_price_dzd);
+      document.getElementById('chk-display-asking-sub').textContent = `${Number(data.asking_price_dzd).toLocaleString()} DZD`;
+
+      const fairM = data.valuation.predicted_price_million_centimes;
+      const fairD = data.valuation.predicted_price_dzd;
+      document.getElementById('chk-display-fair').textContent = formatCurrency(fairM, fairD);
+      document.getElementById('chk-display-fair-sub').textContent = `${Number(fairD).toLocaleString()} DZD`;
+
+      // Negotiation Advice
+      document.getElementById('chk-advice-text').textContent = data.explanation;
+      document.getElementById('chk-target-price').textContent = formatCurrency(fairM, fairD);
+
+      lucide.createIcons();
+    }
+
+    function highlightSegment(seg, ringColor) {
+      const el = document.getElementById(`segment-${seg}`);
+      if (el) {
+        el.classList.remove('opacity-30');
+        el.classList.add('opacity-100', 'ring-2', 'ring-offset-1', ringColor);
+      }
+    }
+
+    // 6. Function 3: Batch CSV
+    async function handleBatchUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const fd = new FormData();
+      fd.append('file', file);
+
+      const panel = document.getElementById('batch-results-panel');
+      panel.classList.remove('hidden');
+      document.getElementById('batch-stat-total').textContent = "Processing...";
+
+      try {
+        const resp = await fetch('/api/upload-csv', { method: 'POST', body: fd });
+        const res = await resp.json();
+        if (res.status === 'success') {
+          document.getElementById('batch-stat-total').textContent = res.stats.total_rows;
+          document.getElementById('batch-stat-avg').textContent = `${res.stats.avg_fair_million} M`;
+          document.getElementById('batch-stat-deals').textContent = res.stats.great_deals_count;
+          document.getElementById('batch-stat-high').textContent = res.stats.high_prices_count;
+          document.getElementById('btn-batch-download').href = `/api/download-evaluated/${res.file_id}`;
+
+          const tbody = document.getElementById('batch-table-body');
+          tbody.innerHTML = '';
+          res.preview.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50 transition-colors";
+            
+            const badge = r.deal_rating_key === 'GREAT_DEAL' ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">Great Deal</span>` :
+              (r.deal_rating_key === 'HIGH_PRICE' || r.deal_rating_key === 'VERY_HIGH' ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">High (${r.difference_pct}%)</span>` :
+              `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">${r.deal_rating || 'Fair'}</span>`);
+
+            tr.innerHTML = `
+              <td class="py-3 px-4 font-bold text-slate-900">${r.brand} ${r.model}</td>
+              <td class="py-3 px-4">${r.year}</td>
+              <td class="py-3 px-4">${Number(r.mileage_km || 0).toLocaleString()} km</td>
+              <td class="py-3 px-4">${r.fuel_type || '-'}</td>
+              <td class="py-3 px-4">W.${r.wilaya_code}</td>
+              <td class="py-3 px-4 font-bold text-sky-700">${r.fair_price_million ? `${r.fair_price_million} M` : '-'}</td>
+              <td class="py-3 px-4">${r.asking_price ? `${r.asking_price} M` : '-'}</td>
+              <td class="py-3 px-4">${badge}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        console.error('Batch error:', err);
+      }
+    }
+
+    // 7. Function 4: Methodology & Diagnostics
+    async function loadMethodology() {
+      try {
+        const resp = await fetch('/api/model-report');
+        const res = await resp.json();
+        if (res.status === 'success') {
+          const report = res.report;
+          
+          // Benchmark table
+          const tbody = document.getElementById('benchmark-table-body');
+          tbody.innerHTML = '';
+          (report.model_comparisons || []).forEach(row => {
+            const tr = document.createElement('tr');
+            tr.className = row.rank === 1 ? "bg-emerald-50/50 font-bold text-emerald-950" : "hover:bg-slate-50 text-slate-700";
+            tr.innerHTML = `
+              <td class="py-2.5 px-4">${row.rank === 1 ? '🥇 #1' : `#${row.rank}`}</td>
+              <td class="py-2.5 px-4 font-semibold text-slate-900">${row.model}</td>
+              <td class="py-2.5 px-4 text-emerald-700 font-bold">${row.mae_million.toFixed(2)} M</td>
+              <td class="py-2.5 px-4">${row.mdape_pct.toFixed(2)}%</td>
+              <td class="py-2.5 px-4">${row.r2.toFixed(3)}</td>
+              <td class="py-2.5 px-4">
+                <span class="px-2 py-0.5 rounded text-[10px] ${row.rank === 1 ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-slate-100 text-slate-600'}">${row.status}</span>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+
+          // Diagnostics Gallery
+          const gal = document.getElementById('diagnostics-gallery');
+          gal.innerHTML = '';
+          (report.diagnostics_images || []).forEach(img => {
+            const card = document.createElement('div');
+            card.className = "bg-white rounded-xl p-3 border border-slate-200 hover:border-slate-300 shadow-xs cursor-pointer group transition-all";
+            card.onclick = () => openImageModal(`/api/diagnostics-image/${img.filename}`, img.title, img.desc);
+            card.innerHTML = `
+              <div class="h-40 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 mb-2">
+                <img src="/api/diagnostics-image/${img.filename}" alt="${img.title}" class="w-full h-full object-cover group-hover:scale-102 transition-all">
+              </div>
+              <h5 class="text-xs font-bold text-slate-900 group-hover:text-sky-600 transition-colors">${img.title}</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2">${img.desc}</p>
+            `;
+            gal.appendChild(card);
+          });
+          lucide.createIcons();
+        }
+      } catch (err) {
+        console.error('Methodology error:', err);
+      }
+    }
+
+    function openImageModal(src, title, desc) {
+      document.getElementById('modal-img-src').src = src;
+      document.getElementById('modal-img-title').textContent = title;
+      document.getElementById('modal-img-desc').textContent = desc;
+      document.getElementById('image-modal').classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+      document.getElementById('image-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

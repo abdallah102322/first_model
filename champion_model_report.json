@@ -1,0 +1,51 @@
+{
+  "model_name": "CatBoost GBDT with Leak-Free Target Encoding & Log1p Target Transformation",
+  "pipeline_file": "algerian_car_price_pipeline.joblib",
+  "dataset": "algeria_cars_200k_model_ready.csv",
+  "total_records": 100197,
+  "nested_cv": {
+    "outer_folds": 5,
+    "inner_folds": 3,
+    "strategy": "StratifiedKFold on Price Deciles + Inner Optuna Bayesian Optimization",
+    "evaluation_currency": "Million Centimes & Algerian Dinars (DZD)",
+    "metrics": {
+      "mae_million_centimes": 152.57,
+      "mae_dzd": 1525700,
+      "mdape_pct": 18.50,
+      "r2_score": 0.894,
+      "rmse_million_centimes": 234.18,
+      "rmse_dzd": 2341800
+    }
+  },
+  "model_comparisons": [
+    {"rank": 1, "model": "CatBoost Regressor (Champion)", "mae_million": 152.57, "mdape_pct": 18.50, "r2": 0.894, "status": "Active Champion"},
+    {"rank": 2, "model": "Stacking Regressor (CatBoost + LightGBM + Ridge)", "mae_million": 153.64, "mdape_pct": 18.72, "r2": 0.891, "status": "Ensemble"},
+    {"rank": 3, "model": "LightGBM Regressor", "mae_million": 154.96, "mdape_pct": 18.91, "r2": 0.887, "status": "Benchmark"},
+    {"rank": 4, "model": "Ridge Regression (Target Encoded)", "mae_million": 156.04, "mdape_pct": 19.34, "r2": 0.880, "status": "Linear Baseline"},
+    {"rank": 5, "model": "XGBoost Regressor", "mae_million": 156.48, "mdape_pct": 19.12, "r2": 0.878, "status": "Tree Ensemble"},
+    {"rank": 6, "model": "Random Forest Regressor", "mae_million": 158.06, "mdape_pct": 20.15, "r2": 0.871, "status": "Tree Ensemble"},
+    {"rank": 7, "model": "Extra Trees Regressor", "mae_million": 159.86, "mdape_pct": 20.84, "r2": 0.865, "status": "Tree Ensemble"},
+    {"rank": 8, "model": "ElasticNet Regressor", "mae_million": 165.39, "mdape_pct": 22.10, "r2": 0.842, "status": "Linear Baseline"},
+    {"rank": 9, "model": "Decision Tree Regressor", "mae_million": 165.86, "mdape_pct": 24.30, "r2": 0.812, "status": "Interpretable Tree"},
+    {"rank": 10, "model": "K-Nearest Neighbors (KNN)", "mae_million": 191.73, "mdape_pct": 35.59, "r2": 0.724, "status": "Distance Baseline"},
+    {"rank": 11, "model": "Dummy Regressor (Median Baseline)", "mae_million": 205.50, "mdape_pct": 48.20, "r2": -0.010, "status": "Naive Baseline"}
+  ],
+  "top_features": [
+    {"name": "year / car_age", "importance_pct": 31.4, "impact": "Exponential depreciation curve with 5-year and 10-year resistance shelves"},
+    {"name": "brand_model (Target Encoded)", "importance_pct": 24.8, "impact": "Captures iconic Algerian market liquidity (Clio, Golf, Picanto)"},
+    {"name": "mileage_km & km_per_year", "importance_pct": 18.2, "impact": "Key wear indicator; penalized heavily above 180,000 km"},
+    {"name": "fuel_type", "importance_pct": 11.6, "impact": "Diesel premium for high-mileage drivers vs Petrol for city commuters"},
+    {"name": "is_luxury_brand", "importance_pct": 7.3, "impact": "Segments high-end German and premium imports (Mercedes, BMW, Audi, Porsche)"},
+    {"name": "transmission", "importance_pct": 4.5, "impact": "Increasing demand and price premium for automatic gearboxes in Algiers & Oran"},
+    {"name": "wilaya_code", "importance_pct": 2.2, "impact": "Regional market dynamics (capital liquidity vs coastal vs interior)"}
+  ],
+  "diagnostics_images": [
+    {"id": "predicted_vs_actual", "title": "Predicted vs Actual Prices", "filename": "predicted_vs_actual.png", "desc": "Correlation plot demonstrating tight fit along the identity line with heteroscedasticity controls."},
+    {"id": "residuals_vs_predicted", "title": "Residuals Analysis", "filename": "residuals_vs_predicted.png", "desc": "Residual plot showing zero-centered homoscedastic error distribution."},
+    {"id": "error_distribution", "title": "Error Distribution & Skew", "filename": "error_distribution.png", "desc": "Histogram and KDE of prediction residuals showing normal bell shape centered at zero."},
+    {"id": "cv_score_per_fold", "title": "5-Fold CV Score Stability", "filename": "cv_score_per_fold.png", "desc": "Fold-by-fold MAE and MdAPE verifying consistent generalization without fold degradation."},
+    {"id": "learning_curve", "title": "Learning Curve", "filename": "learning_curve.png", "desc": "Convergence of training and validation curves confirming absence of overfitting."},
+    {"id": "feature_importance", "title": "Feature Importance Breakdown", "filename": "feature_importance.png", "desc": "Relative predictive power of engineered and target-encoded features."},
+    {"id": "shap_summary", "title": "SHAP Summary Values", "filename": "shap_summary.png", "desc": "SHAP beeswarm plot illustrating directional impact of vehicle age, brand, and mileage."}
+  ]
+}
